@@ -60,17 +60,30 @@ public class AuthService implements UserDetailsService {
     }
     
     public AuthResponse login(AuthRequest request) {
-        UserDetails userDetails = loadUserByUsername(request.getEmail());
-        
-        if (!passwordEncoder.matches(request.getPassword(), userDetails.getPassword())) {
-            throw new RuntimeException("Invalid password");
+        try {
+            // First find the user to get their details
+            User user = userRepository.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + request.getEmail()));
+            
+            // Load user details which includes authorities
+            UserDetails userDetails = loadUserByUsername(request.getEmail());
+            
+            // Verify password
+            if (!passwordEncoder.matches(request.getPassword(), userDetails.getPassword())) {
+                throw new RuntimeException("Invalid password");
+            }
+            
+            // Generate token with user details
+            String token = jwtService.generateToken(userDetails);
+            System.out.println("Login successful for user: " + request.getEmail());
+            
+            return new AuthResponse(token, user);
+        } catch (UsernameNotFoundException e) {
+            System.err.println("Login failed - User not found: " + request.getEmail());
+            throw e;
+        } catch (Exception e) {
+            System.err.println("Login failed for user " + request.getEmail() + ": " + e.getMessage());
+            throw new RuntimeException("Authentication failed", e);
         }
-        
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        
-        String token = jwtService.generateToken(userDetails);
-        
-        return new AuthResponse(token, user);
     }
 }

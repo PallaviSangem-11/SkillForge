@@ -11,14 +11,36 @@ const AddCourse = () => {
     difficultyLevel: DIFFICULTY_LEVELS.BEGINNER,
     estimatedDuration: '',
     prerequisites: '',
+    materials: [''],
   });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleMaterialChange = (index, value) => {
+    setFormData((prev) => {
+      const materials = [...(prev.materials || [])];
+      materials[index] = value;
+      return { ...prev, materials };
+    });
+  };
+
+  const addMaterial = () => {
+    setFormData((prev) => ({ ...prev, materials: [...(prev.materials || []), ''] }));
+  };
+
+  const removeMaterial = (index) => {
+    setFormData((prev) => {
+      const materials = [...(prev.materials || [])];
+      materials.splice(index, 1);
+      return { ...prev, materials };
     });
   };
 
@@ -27,7 +49,14 @@ const AddCourse = () => {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/courses', formData);
+      // Ensure estimatedDuration is sent as integer (or null) and filter empty material links
+      const payload = {
+        ...formData,
+        estimatedDuration: formData.estimatedDuration ? parseInt(formData.estimatedDuration, 10) : null,
+        materials: (formData.materials || []).filter((m) => m && m.trim() !== ''),
+      };
+
+      const response = await api.post('/courses', payload);
       toast.success('Course created successfully!');
       navigate('/instructor/courses');
     } catch (error) {
@@ -131,6 +160,28 @@ const AddCourse = () => {
             value={formData.prerequisites}
             onChange={handleChange}
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Materials (links)</label>
+          <div className="space-y-2">
+            {(formData.materials || []).map((m, idx) => (
+              <div key={idx} className="flex items-center space-x-2">
+                <input
+                  type="url"
+                  className="input-field flex-1"
+                  placeholder="https://example.com/resource"
+                  value={m}
+                  onChange={(e) => handleMaterialChange(idx, e.target.value)}
+                />
+                <button type="button" onClick={() => removeMaterial(idx)} className="btn-secondary">Remove</button>
+              </div>
+            ))}
+
+            <div>
+              <button type="button" onClick={addMaterial} className="btn-primary">Add Material</button>
+            </div>
+          </div>
         </div>
 
         <div className="flex justify-end space-x-4">

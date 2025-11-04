@@ -34,6 +34,9 @@ public class Course {
     
     @Column(columnDefinition = "TEXT")
     private String prerequisites;
+
+    @Column(name = "materials", columnDefinition = "TEXT")
+    private String materials; // stored as JSON array string
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instructor_id", nullable = false)
@@ -118,6 +121,14 @@ public class Course {
     
     public void setPrerequisites(String prerequisites) {
         this.prerequisites = prerequisites;
+    }
+
+    public String getMaterials() {
+        return materials;
+    }
+
+    public void setMaterials(String materials) {
+        this.materials = materials;
     }
     
     public User getInstructor() {

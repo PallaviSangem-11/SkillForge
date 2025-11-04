@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import api from '../../api/axiosConfig';
+import { useAuth } from '../../auth/useAuth';
 import { getDifficultyDisplayName, getDifficultyColor } from '../../utils/roles';
 import Loader from '../../components/Loader';
 
 const CourseList = () => {
+  const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editingCourse, setEditingCourse] = useState(null);
@@ -15,6 +17,7 @@ const CourseList = () => {
     difficultyLevel: '',
     estimatedDuration: '',
     prerequisites: '',
+    materials: [],
   });
 
   useEffect(() => {
@@ -24,7 +27,11 @@ const CourseList = () => {
   const fetchCourses = async () => {
     try {
       const response = await api.get('/courses');
-      setCourses(response.data);
+      // Filter courses to show only the current instructor's courses
+      const instructorCourses = response.data.filter(course => 
+        course.instructorId === user.id || course.instructor?.id === user.id
+      );
+      setCourses(instructorCourses);
     } catch (error) {
       toast.error('Failed to fetch courses');
     } finally {
@@ -40,6 +47,7 @@ const CourseList = () => {
       difficultyLevel: course.difficultyLevel,
       estimatedDuration: course.estimatedDuration || '',
       prerequisites: course.prerequisites || '',
+      materials: course.materials || [],
     });
   };
 
@@ -50,10 +58,36 @@ const CourseList = () => {
     });
   };
 
+  const handleMaterialChange = (index, value) => {
+    setEditFormData((prev) => {
+      const materials = [...(prev.materials || [])];
+      materials[index] = value;
+      return { ...prev, materials };
+    });
+  };
+
+  const addEditMaterial = () => {
+    setEditFormData((prev) => ({ ...prev, materials: [...(prev.materials || []), ''] }));
+  };
+
+  const removeEditMaterial = (index) => {
+    setEditFormData((prev) => {
+      const materials = [...(prev.materials || [])];
+      materials.splice(index, 1);
+      return { ...prev, materials };
+    });
+  };
+
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/courses/${editingCourse.id}`, editFormData);
+      const payload = {
+        ...editFormData,
+        estimatedDuration: editFormData.estimatedDuration ? parseInt(editFormData.estimatedDuration, 10) : null,
+        materials: (editFormData.materials || []).filter((m) => m && m.trim() !== ''),
+      };
+
+      await api.put(`/courses/${editingCourse.id}`, payload);
       toast.success('Course updated successfully!');
       setEditingCourse(null);
       fetchCourses();
@@ -177,6 +211,27 @@ const CourseList = () => {
                       onChange={handleEditChange}
                     />
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Materials (links)</label>
+                    <div className="space-y-2">
+                      {(editFormData.materials || []).map((m, idx) => (
+                        <div key={idx} className="flex items-center space-x-2">
+                          <input
+                            type="url"
+                            className="input-field flex-1"
+                            placeholder="https://example.com/resource"
+                            value={m}
+                            onChange={(e) => handleMaterialChange(idx, e.target.value)}
+                          />
+                          <button type="button" onClick={() => removeEditMaterial(idx)} className="btn-secondary">Remove</button>
+                        </div>
+                      ))}
+                      <div>
+                        <button type="button" onClick={addEditMaterial} className="btn-primary">Add Material</button>
+                      </div>
+                    </div>
+                  </div>
                   
                   <div className="flex justify-end space-x-3">
                     <button
@@ -207,7 +262,11 @@ const CourseList = () => {
                         {course.estimatedDuration && (
                           <span>⏱️ {course.estimatedDuration} hours</span>
                         )}
-                        <span>📅 Created {new Date(course.createdAt).toLocaleDateString()}</span>
+                        <span>
+                          📅 Created {
+                            course.createdAt ? new Date(course.createdAt).toLocaleString() : '—'
+                          }
+                        </span>
                       </div>
                     </div>
                     
@@ -231,6 +290,20 @@ const CourseList = () => {
                     <div className="bg-gray-50 p-3 rounded-lg">
                       <h4 className="text-sm font-medium text-gray-700 mb-1">Prerequisites:</h4>
                       <p className="text-sm text-gray-600">{course.prerequisites}</p>
+                    </div>
+                  )}
+                  {course.materials && course.materials.length > 0 && (
+                    <div className="bg-white border mt-3 p-3 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-1">Materials:</h4>
+                      <ul className="list-disc list-inside text-sm text-blue-600">
+                        {course.materials.map((m, idx) => (
+                          <li key={idx}>
+                            <a href={m} target="_blank" rel="noreferrer" className="hover:underline">
+                              {m}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   )}
                 </div>

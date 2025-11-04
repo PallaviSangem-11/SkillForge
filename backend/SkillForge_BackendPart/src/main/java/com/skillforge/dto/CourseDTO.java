@@ -2,6 +2,7 @@ package com.skillforge.dto;
 
 import com.skillforge.entity.Course;
 import com.skillforge.entity.User;
+import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,6 +25,8 @@ public class CourseDTO {
     private Integer estimatedDuration;
     
     private String prerequisites;
+
+    private List<String> materials;
     
     private Long instructorId;
     
@@ -89,6 +92,14 @@ public class CourseDTO {
     
     public void setPrerequisites(String prerequisites) {
         this.prerequisites = prerequisites;
+    }
+
+    public List<String> getMaterials() {
+        return materials;
+    }
+
+    public void setMaterials(List<String> materials) {
+        this.materials = materials;
     }
     
     public Long getInstructorId() {

@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.ArrayList;
 
 @Service
 public class CourseService {
@@ -22,6 +25,8 @@ public class CourseService {
     
     @Autowired
     private UserRepository userRepository;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
     
     public List<CourseDTO> getAllCourses() {
         List<Course> courses = courseRepository.findAll();
@@ -50,6 +55,15 @@ public class CourseService {
         course.setDifficultyLevel(courseDTO.getDifficultyLevel());
         course.setEstimatedDuration(courseDTO.getEstimatedDuration());
         course.setPrerequisites(courseDTO.getPrerequisites());
+        // set materials as JSON string
+        try {
+            if (courseDTO.getMaterials() != null) {
+                course.setMaterials(objectMapper.writeValueAsString(courseDTO.getMaterials()));
+            }
+        } catch (Exception e) {
+            // ignore serialization issues; store null
+            course.setMaterials(null);
+        }
         course.setInstructor(instructor);
         
         Course savedCourse = courseRepository.save(course);
@@ -79,6 +93,15 @@ public class CourseService {
         course.setDifficultyLevel(courseDTO.getDifficultyLevel());
         course.setEstimatedDuration(courseDTO.getEstimatedDuration());
         course.setPrerequisites(courseDTO.getPrerequisites());
+        try {
+            if (courseDTO.getMaterials() != null) {
+                course.setMaterials(objectMapper.writeValueAsString(courseDTO.getMaterials()));
+            } else {
+                course.setMaterials(null);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
         
         Course updatedCourse = courseRepository.save(course);
         return convertToDTO(updatedCourse);
@@ -105,7 +128,7 @@ public class CourseService {
         courseRepository.delete(course);
     }
     
-    private CourseDTO convertToDTO(Course course) {
+    public CourseDTO convertToDTO(Course course) {
         CourseDTO dto = new CourseDTO();
         dto.setId(course.getId());
         dto.setTitle(course.getTitle());
@@ -113,6 +136,17 @@ public class CourseService {
         dto.setDifficultyLevel(course.getDifficultyLevel());
         dto.setEstimatedDuration(course.getEstimatedDuration());
         dto.setPrerequisites(course.getPrerequisites());
+        // parse materials JSON to List<String>
+        try {
+            if (course.getMaterials() != null && !course.getMaterials().isEmpty()) {
+                List<String> materials = objectMapper.readValue(course.getMaterials(), new TypeReference<List<String>>(){});
+                dto.setMaterials(materials);
+            } else {
+                dto.setMaterials(new ArrayList<>());
+            }
+        } catch (Exception e) {
+            dto.setMaterials(new ArrayList<>());
+        }
         
         // Safely get instructor info without circular reference
         if (course.getInstructor() != null) {
