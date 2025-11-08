@@ -78,7 +78,7 @@ const Register = () => {
 
   return (
     <div className="h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8" style={{ background: 'linear-gradient(135deg, #1E3A8A, #3B82F6)' }}>
-      <div className="max-w-lg w-full">
+      <div className="max-w-md w-full">
         {/* Compact Registration Form */}
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header Section - Compact */}
@@ -100,7 +100,7 @@ const Register = () => {
 
           {/* Registration Form */}
           <div className="p-5">
-            <h2 className="text-lg font-bold text-center mb-4" style={{ color: '#111827' }}>
+            <h2 className="text-base font-bold text-center mb-3" style={{ color: '#111827' }}>
               Create your account
             </h2>
           
@@ -252,7 +252,7 @@ const Register = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full flex justify-center py-3 px-4 rounded-lg text-sm font-medium text-white transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-medium text-white transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{ background: 'linear-gradient(135deg, #10B981, #3B82F6)' }}
                 >
                   {isLoading ? (

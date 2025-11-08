@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../auth/useAuth';
 import api from '../../api/axiosConfig';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Line, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -29,6 +29,7 @@ ChartJS.register(
 
 const StudentDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -160,89 +161,34 @@ const StudentDashboard = () => {
           </div>
         )}
       </div>
-
-      {/* Recommended Courses */}
-      {dashboard.recommendedCourses && dashboard.recommendedCourses.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">🎯 Recommended Courses (AI Suggested)</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {dashboard.recommendedCourses.map((course) => (
-              <div key={course.id} className="border rounded-lg p-4 hover:shadow-md transition">
-                <h4 className="font-semibold text-lg">{course.title}</h4>
-                <p className="text-sm text-gray-600 mt-1">{course.description}</p>
-                <div className="mt-3">
-                  <Link
-                    to={`/student/courses`}
-                    className="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                  >
-                    View Course
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Enrolled Courses */}
-      {dashboard.enrolledCourses && dashboard.enrolledCourses.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">📚 My Enrolled Courses</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {dashboard.enrolledCourses.map((course) => (
-              <div key={course.id} className="border rounded-lg p-4 hover:shadow-md transition">
-                <h4 className="font-semibold text-lg">{course.title}</h4>
-                <p className="text-sm text-gray-600 mt-1">{course.description}</p>
-                <div className="mt-3">
-                  <Link
-                    to={`/student/courses`}
-                    className="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                  >
-                    Continue Learning
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Recent Activities */}
-      {dashboard.recentActivities && dashboard.recentActivities.length > 0 && (
+      {/* Recent Activities (Other) */}
+      {dashboard.recentActivities && dashboard.recentActivities.filter(a => a.activityType !== 'QUIZ_ATTEMPT').length > 0 && (
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
           <div className="space-y-3">
-            {dashboard.recentActivities.map((activity, idx) => (
-              <div key={idx} className="border-l-4 border-blue-500 pl-4 py-2">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-medium">{activity.title}</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(activity.timestamp).toLocaleString()}
-                    </p>
+            {dashboard.recentActivities
+              .filter(activity => activity.activityType !== 'QUIZ_ATTEMPT')
+              .map((activity, idx) => (
+                <div key={idx} className="border-l-4 border-blue-500 pl-4 py-2">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="font-medium">{activity.title}</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(activity.timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                    {activity.score !== null && (
+                      <span className={`px-3 py-1 rounded ${
+                        activity.score >= 80 ? 'bg-green-100 text-green-800' :
+                        activity.score >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {activity.score.toFixed(1)}%
+                      </span>
+                    )}
                   </div>
-                  {activity.score !== null && (
-                    <span className={`px-3 py-1 rounded ${
-                      activity.score >= 80 ? 'bg-green-100 text-green-800' :
-                      activity.score >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {activity.score.toFixed(1)}%
-                    </span>
-                  )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Course Analytics */}
-      {courseAnalytics.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Course Performance</h3>
-          <div className="h-64">
-            <Doughnut data={pieChartData} options={{ responsive: true, maintainAspectRatio: true }} />
+              ))}
           </div>
         </div>
       )}

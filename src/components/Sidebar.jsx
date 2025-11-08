@@ -25,6 +25,8 @@ const Sidebar = () => {
           { name: 'My Courses', href: '/instructor/courses', icon: '📚' },
           { name: 'Add Course', href: '/instructor/courses/add', icon: '➕' },
           { name: 'Generate Quiz', href: '/instructor/quiz', icon: '🧠' },
+          // Use Course Operations page as Quiz Recommendation — rename in nav
+          { name: 'Quiz Recommendation', href: '/instructor/course-operations', icon: '💡' },
           { name: 'Analytics', href: '/instructor/analytics', icon: '📊' },
         ];
       case ROLES.ADMIN:

@@ -1,9 +1,11 @@
 import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
 import { getRoleDisplayName } from '../utils/roles';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="shadow-2xl border-b" style={{ backgroundColor: '#1E3A8A', borderColor: '#3B82F6' }}>
@@ -21,6 +23,27 @@ const Navbar = () => {
           </div>
           
           <div className="flex items-center space-x-6">
+            {!user && (
+              <>
+                <div className="hidden md:flex items-center space-x-6">
+                  <a href="#services" className="text-sm text-blue-100 hover:text-white">Services</a>
+                  <a href="#contact" className="text-sm text-blue-100 hover:text-white">Contact</a>
+                </div>
+                <div className="h-6 w-px" style={{ backgroundColor: '#3B82F6' }}></div>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => navigate('/register')}
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-blue-100 border border-blue-400 hover:bg-blue-800"
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
             {user && (
               <>
                 <div className="flex items-center space-x-4">

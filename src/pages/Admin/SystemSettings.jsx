@@ -115,8 +115,10 @@ const SystemSettings = () => {
           <h2 className="text-lg font-semibold mb-4">General Settings</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
+              <label htmlFor="siteName" className="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
               <input
+                id="siteName"
+                name="siteName"
                 type="text"
                 value={settings.siteName}
                 onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
@@ -124,8 +126,10 @@ const SystemSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Site Description</label>
+              <label htmlFor="siteDescription" className="block text-sm font-medium text-gray-700 mb-1">Site Description</label>
               <textarea
+                id="siteDescription"
+                name="siteDescription"
                 value={settings.siteDescription}
                 onChange={(e) => setSettings({ ...settings, siteDescription: e.target.value })}
                 className="w-full border rounded px-3 py-2"
@@ -145,8 +149,10 @@ const SystemSettings = () => {
               </label>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Default User Role</label>
+              <label htmlFor="defaultRole" className="block text-sm font-medium text-gray-700 mb-1">Default User Role</label>
               <select
+                id="defaultRole"
+                name="defaultRole"
                 value={settings.defaultRole}
                 onChange={(e) => setSettings({ ...settings, defaultRole: e.target.value })}
                 className="w-full border rounded px-3 py-2"
@@ -163,8 +169,10 @@ const SystemSettings = () => {
           <h2 className="text-lg font-semibold mb-4">Security Settings</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Session Timeout (minutes)</label>
+              <label htmlFor="sessionTimeout" className="block text-sm font-medium text-gray-700 mb-1">Session Timeout (minutes)</label>
               <input
+                id="sessionTimeout"
+                name="sessionTimeout"
                 type="number"
                 value={settings.sessionTimeout}
                 onChange={(e) => setSettings({ ...settings, sessionTimeout: parseInt(e.target.value) })}
@@ -174,8 +182,10 @@ const SystemSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max File Size (MB)</label>
+              <label htmlFor="maxFileSize" className="block text-sm font-medium text-gray-700 mb-1">Max File Size (MB)</label>
               <input
+                id="maxFileSize"
+                name="maxFileSize"
                 type="number"
                 value={settings.maxFileSize}
                 onChange={(e) => setSettings({ ...settings, maxFileSize: parseInt(e.target.value) })}
@@ -216,8 +226,10 @@ const SystemSettings = () => {
           <h2 className="text-lg font-semibold mb-4">AI Settings</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gemini API Key</label>
+              <label htmlFor="geminiApiKey" className="block text-sm font-medium text-gray-700 mb-1">Gemini API Key</label>
               <input
+                id="geminiApiKey"
+                name="geminiApiKey"
                 type="password"
                 value={settings.geminiApiKey}
                 onChange={(e) => setSettings({ ...settings, geminiApiKey: e.target.value })}
@@ -248,8 +260,10 @@ const SystemSettings = () => {
           <h2 className="text-lg font-semibold mb-4">Quiz Settings</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max Quiz Attempts</label>
+              <label htmlFor="maxQuizAttempts" className="block text-sm font-medium text-gray-700 mb-1">Max Quiz Attempts</label>
               <input
+                id="maxQuizAttempts"
+                name="maxQuizAttempts"
                 type="number"
                 value={settings.maxQuizAttempts}
                 onChange={(e) => setSettings({ ...settings, maxQuizAttempts: parseInt(e.target.value) })}
@@ -259,8 +273,10 @@ const SystemSettings = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Default Quiz Time Limit (minutes)</label>
+              <label htmlFor="quizTimeLimit" className="block text-sm font-medium text-gray-700 mb-1">Default Quiz Time Limit (minutes)</label>
               <input
+                id="quizTimeLimit"
+                name="quizTimeLimit"
                 type="number"
                 value={settings.quizTimeLimit}
                 onChange={(e) => setSettings({ ...settings, quizTimeLimit: parseInt(e.target.value) })}

@@ -59,6 +59,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/courses/**").hasRole("INSTRUCTOR")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/student/**").hasRole("STUDENT")
+                // Allow AI endpoints for any authenticated user (requires a valid JWT). Change to hasRole("INSTRUCTOR") if
+                // you want to restrict to instructors only in production.
+                .requestMatchers("/api/ai/**").authenticated()
                 .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

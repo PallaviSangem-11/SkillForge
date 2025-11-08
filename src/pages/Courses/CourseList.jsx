@@ -98,15 +98,41 @@ const CourseList = () => {
   };
 
   const handleDelete = async (courseId) => {
-    if (window.confirm('Are you sure you want to delete this course?')) {
+    const course = courses.find(c => c.id === courseId);
+    if (!course) {
+      toast.error('Course not found');
+      return;
+    }
+
+    // Create a more user-friendly confirmation dialog
+    const confirmDialog = window.confirm(
+      `Warning: You are about to delete the course "${course.title}"\n\n` +
+      'This action will permanently delete:\n' +
+      '• The course and all its content\n' +
+      '• All quizzes and their questions\n' +
+      '• All student enrollments\n' +
+      '• All quiz attempts and scores\n' +
+      '• All feedback and ratings\n\n' +
+      'This action CANNOT be undone. Are you sure you want to proceed?'
+    );
+    
+    if (confirmDialog) {
+      // Show a loading toast while deletion is in progress
+      const loadingToast = toast.loading('Deleting course...');
       try {
         await api.delete(`/courses/${courseId}`);
-        toast.success('Course deleted successfully!');
+        toast.dismiss(loadingToast);
+        toast.success('Course and all related content deleted successfully!');
         fetchCourses();
       } catch (error) {
-        const errorMessage = error.response?.data?.message || 'Failed to delete course';
+        toast.dismiss(loadingToast);
+        const errorMessage = error.response?.data?.message || error.response?.data || 'Failed to delete course. It may have existing enrollments or quiz attempts.';
         toast.error(errorMessage);
+        console.error('Delete error:', error);
       }
+    } else if (userInput !== null) {
+      // User entered something but not "DELETE"
+      toast.info('Deletion cancelled. You must type "DELETE" to confirm.');
     }
   };
 

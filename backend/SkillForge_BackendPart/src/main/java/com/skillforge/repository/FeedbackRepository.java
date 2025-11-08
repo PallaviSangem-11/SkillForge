@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     List<Feedback> findByCourseId(Long courseId);
+
+	void deleteAllByCourseId(Long id);
 }

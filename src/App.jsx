@@ -11,6 +11,8 @@ import Loader from './components/Loader';
 
 // Pages
 import Login from './pages/Login';
+import Landing from './pages/Landing';
+import Language from './pages/Language';
 import Register from './pages/Register';
 import StudentDashboard from './pages/Dashboard/StudentDashboard';
 import InstructorDashboard from './pages/Dashboard/InstructorDashboard';
@@ -18,11 +20,14 @@ import AdminDashboard from './pages/Dashboard/AdminDashboard';
 import AddCourse from './pages/Courses/AddCourse';
 import CourseList from './pages/Courses/CourseList';
 import StudentCourseList from './pages/Courses/StudentCourseList';
+import CourseOperations from './pages/Courses/CourseOperations';
 import RecommendedCoursesPage from './pages/RecommendedCourses';
 import GenerateQuiz from './pages/Courses/GenerateQuiz';
 import TakeQuiz from './pages/Quiz/TakeQuiz';
 import TakeQuizList from './pages/Quiz/TakeQuizList';
+import QuizResponse from './pages/Quiz/QuizResponse';
 import StudentProgress from './pages/Progress/StudentProgress';
+import CourseDetails from './pages/Courses/CourseDetails';
 import ManageUsers from './pages/Admin/ManageUsers';
 import AllCourses from './pages/Admin/AllCourses';
 import Reports from './pages/Admin/Reports';
@@ -67,6 +72,14 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
+      <Route 
+        path="/" 
+        element={<Landing />} 
+      />
+      <Route 
+        path="/language" 
+        element={<Language />} 
+      />
       <Route 
         path="/login" 
         element={
@@ -138,6 +151,16 @@ const AppRoutes = () => {
         } 
       />
       <Route 
+        path="/student/quiz/:quizId/response" 
+        element={
+          <PrivateRoute requiredRole={ROLES.STUDENT}>
+            <AuthenticatedLayout>
+              <QuizResponse />
+            </AuthenticatedLayout>
+          </PrivateRoute>
+        } 
+      />
+      <Route 
         path="/student/progress" 
         element={
           <PrivateRoute requiredRole={ROLES.STUDENT}>
@@ -156,6 +179,18 @@ const AppRoutes = () => {
             </AuthenticatedLayout>
           </PrivateRoute>
         } 
+      />
+
+      {/* Course details route (authenticated users) */}
+      <Route 
+        path="/courses/:id" 
+        element={
+          <PrivateRoute>
+            <AuthenticatedLayout>
+              <CourseDetails />
+            </AuthenticatedLayout>
+          </PrivateRoute>
+        }
       />
 
       {/* Instructor Routes */}
@@ -195,6 +230,17 @@ const AppRoutes = () => {
           <PrivateRoute requiredRole={ROLES.INSTRUCTOR}>
             <AuthenticatedLayout>
               <GenerateQuiz />
+            </AuthenticatedLayout>
+          </PrivateRoute>
+        } 
+      />
+      {/* Removed separate RecommendationQuiz page — using CourseOperations for quiz recommendations */}
+      <Route 
+        path="/instructor/course-operations" 
+        element={
+          <PrivateRoute requiredRole={ROLES.INSTRUCTOR}>
+            <AuthenticatedLayout>
+              <CourseOperations />
             </AuthenticatedLayout>
           </PrivateRoute>
         } 

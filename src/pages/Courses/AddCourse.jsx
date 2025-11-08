@@ -111,7 +111,7 @@ const AddCourse = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="difficultyLevel" className="block text-sm font-medium text-gray-700 mb-2">
               Difficulty Level *
             </label>
             <select
@@ -163,12 +163,14 @@ const AddCourse = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Materials (links)</label>
+          <label htmlFor="materials-0" className="block text-sm font-medium text-gray-700 mb-2">Materials (links)</label>
           <div className="space-y-2">
             {(formData.materials || []).map((m, idx) => (
               <div key={idx} className="flex items-center space-x-2">
                 <input
                   type="url"
+                  id={`materials-${idx}`}
+                  name={`materials[${idx}]`}
                   className="input-field flex-1"
                   placeholder="https://example.com/resource"
                   value={m}

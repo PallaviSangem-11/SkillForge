@@ -70,6 +70,18 @@ const TakeQuizList = () => {
     return Math.round(Math.max(...quizAttempts.map(a => a.score || 0)));
   };
 
+  const getQuizStats = (quizId) => {
+    const quizAttempts = getQuizAttempts(quizId);
+    if (quizAttempts.length === 0) return null;
+    const scores = quizAttempts.map(a => a.score || 0).filter(s => s > 0);
+    if (scores.length === 0) return null;
+    return {
+      highest: Math.round(Math.max(...scores)),
+      average: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+      lowest: Math.round(Math.min(...scores))
+    };
+  };
+
   const getQuizButtonLabel = (quiz) => {
     const attempts = getQuizAttempts(quiz.id);
     if (attempts.length === 0) return 'Take Quiz';
@@ -85,8 +97,8 @@ const TakeQuizList = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Take Quiz</h1>
-        <p className="text-gray-600">Choose any quiz from your enrolled courses</p>
+        <h1 className="text-2xl font-bold">Quizzes</h1>
+        <p className="text-gray-600">All quizzes from your enrolled courses</p>
       </div>
 
       {courses.length === 0 ? (
@@ -151,33 +163,46 @@ const TakeQuizList = () => {
                               </div>
                             </div>
                             
-                            {attemptCount > 0 && (
-                              <div className="mb-3 text-xs">
-                                <div className="flex justify-between">
-                                  <span>Last Score:</span>
-                                  <span className={`font-medium ${lastScore >= 80 ? 'text-green-600' : lastScore >= 60 ? 'text-yellow-600' : 'text-red-600'}`}>
-                                    {lastScore}%
-                                  </span>
+                            {attemptCount > 0 && (() => {
+                              const stats = getQuizStats(quiz.id);
+                              return stats ? (
+                                <div className="mb-3 p-2 bg-gray-50 rounded text-xs space-y-1">
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Highest:</span>
+                                    <span className="font-semibold text-green-600">{stats.highest}%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Average:</span>
+                                    <span className="font-semibold text-blue-600">{stats.average}%</span>
+                                  </div>
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-600">Lowest:</span>
+                                    <span className="font-semibold text-red-600">{stats.lowest}%</span>
+                                  </div>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>Best Score:</span>
-                                  <span className="font-medium text-blue-600">{bestScore}%</span>
-                                </div>
-                              </div>
-                            )}
+                              ) : null;
+                            })()}
                             
-                            <button
-                              onClick={() => navigate(`/student/quiz/${quiz.id}`)}
-                              className={`w-full py-2 px-3 rounded text-sm font-medium transition-colors ${
-                                attemptCount === 0 
-                                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                  : lastScore < 80
-                                    ? 'bg-orange-600 hover:bg-orange-700 text-white'
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => navigate(`/student/quiz/${quiz.id}`)}
+                                className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
+                                  attemptCount === 0 
+                                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
                                     : 'bg-green-600 hover:bg-green-700 text-white'
-                              }`}
-                            >
-                              {getQuizButtonLabel(quiz)}
-                            </button>
+                                }`}
+                              >
+                                {attemptCount === 0 ? 'Take Quiz' : 'Retake Quiz'}
+                              </button>
+                              {attemptCount > 0 && (
+                                <button
+                                  onClick={() => navigate(`/student/quiz/${quiz.id}/response`)}
+                                  className="py-2 px-3 rounded text-sm font-medium border bg-white hover:bg-gray-50"
+                                >
+                                  View Response
+                                </button>
+                              )}
+                            </div>
                           </div>
                         );
                       })}

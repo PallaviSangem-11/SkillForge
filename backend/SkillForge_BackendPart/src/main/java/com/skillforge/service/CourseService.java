@@ -3,8 +3,15 @@ package com.skillforge.service;
 import com.skillforge.dto.CourseDTO;
 import com.skillforge.entity.Course;
 import com.skillforge.entity.User;
+import com.skillforge.repository.CourseEnrollmentRepository;
 import com.skillforge.repository.CourseRepository;
+import com.skillforge.repository.FeedbackRepository;
+import com.skillforge.repository.QuizAttemptRepository;
+import com.skillforge.repository.QuizRepository;
 import com.skillforge.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,7 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayList;
 
+
 @Service
+@Transactional
 public class CourseService {
     
     @Autowired
@@ -25,6 +34,18 @@ public class CourseService {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CourseEnrollmentRepository enrollmentRepository;
+
+    @Autowired
+    private QuizRepository quizRepository;
+
+    @Autowired
+    private QuizAttemptRepository quizAttemptRepository;
+
+    @Autowired
+    private FeedbackRepository feedbackRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     
@@ -106,13 +127,13 @@ public class CourseService {
         Course updatedCourse = courseRepository.save(course);
         return convertToDTO(updatedCourse);
     }
-    
+
+    @Transactional
     public void deleteCourse(Long id) {
         Optional<Course> courseOpt = courseRepository.findById(id);
         if (courseOpt.isEmpty()) {
             throw new RuntimeException("Course not found");
         }
-        
         Course course = courseOpt.get();
         
         // Check if the current user is the instructor of this course
@@ -125,7 +146,16 @@ public class CourseService {
             throw new RuntimeException("You can only delete your own courses");
         }
         
-        courseRepository.delete(course);
+        try {
+            // Since we have cascade delete set up in our entities, we can just delete the course
+            // and let JPA handle the deletion of related entities
+            courseRepository.delete(course);
+            
+            // Explicitly flush to ensure all deletes are processed
+            courseRepository.flush();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete course: " + e.getMessage());
+        }
     }
     
     public CourseDTO convertToDTO(Course course) {
