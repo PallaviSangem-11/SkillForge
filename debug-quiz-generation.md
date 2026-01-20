@@ -41,7 +41,7 @@ const api = axios.create({
 ## Step 4: Verify Gemini API Key
 1. **Check application.properties:**
 ```properties
-gemini.api.key=AIzaSyCAysFPEB1sViDLawNDmKmFYQMfnFxTxJk
+gemini.api.key=your_api_key
 ```
 
 2. **Test Gemini API directly:**
